@@ -1,0 +1,9 @@
+' styling options
+skinparam default {
+    FontName Consolas
+}
+skinparam class {
+    FontStyle bold
+    AttributeIconSize 0
+}
+hide circle

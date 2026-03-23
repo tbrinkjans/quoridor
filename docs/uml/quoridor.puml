@@ -1,0 +1,140 @@
+@startuml quoridor
+
+' config includes
+!include config/styles.iuml
+
+' class diagram (https://plantuml.com/class-diagram)
+package quoridor {
+    package common {
+        class Position <<leaf>> {
+            - x: int {readOnly}
+            - y: int {readOnly}
+            --
+            + Position(x: int, y: int)
+            + x(): int
+            + y(): int
+        }
+
+        enum Orientation <<enumeration>> {
+            + HORIZONTAL
+            + VERTICAL
+        }
+    }
+
+    package board {
+        class Board {
+            - fields: Field[][] {readOnly}
+            - walls: Set<Wall> {readOnly}
+            - pawns: List<Pawn> {readOnly}
+            --
+            + Board(pawnsCount: int)
+            + getFields(): Field[][]
+            + placeWall(wall: Wall)
+            + getWalls(): Set<Wall>
+            + movePawn(pawn: Pawn, destination: Field)
+            + getPawns(): List<Pawn>
+        }
+
+        class Field {
+            - position: Position {readOnly}
+            - neighbors: Set<Field> {readOnly}
+            - pawn: Pawn
+            --
+            # Field(position: Position)
+            + getPosition(): Position
+            # addNeighbor(field: Field)
+            # removeNeighbor(field: Field)
+            + getNeighbors(): Set<Field>
+            # setPawn(pawn: Pawn)
+            + hasPawn(): boolean
+            + getPawn(): Pawn
+        }
+
+        class Pawn {
+            - field: Field
+            - winningFields: Set<Field> {readOnly}
+            --
+            # Pawn(startingField: Field, winningFields: Set<Field>)
+            # setField(field: Field)
+            + getField(): Field
+            + hasReachedFinish(): boolean
+            + getWinningFields(): Set<Field>
+        }
+
+        class Wall {
+            - position: Position {readOnly}
+            - orientation: Orientation {readOnly}
+            --
+            + Wall(position: Position, orientation: Orientation)
+            + getPosition(): Position
+            + getOrientation(): Orientation
+        }
+    }
+
+    package game {
+        class Game {
+            - board: Board {readOnly}
+            - players: List<Player> {readOnly}
+            - currentPlayerIndex: int
+            - turns: Stack<Turn> {readOnly}
+            --
+            + create(playersCount): Game {static}
+            - Game(playersCount: int)
+            + executeTurn(turn: Turn)
+            + validateTurn(turn: Turn): boolean
+            + getValidTurns(player: Player): Set<Turn>
+            + hasValidTurns(player: Player): boolean
+            - nextCurrentPlayer()
+            + getCurrentPlayerIndex(): int
+            + getCurrentPlayer(): Player
+            + getPlayers(): List<Player>
+            + getBoard(): Board
+        }
+
+        class Player {
+            - pawn: Pawn {readOnly}
+            - wallsLeft: int
+            --
+            # Player(pawn: Pawn, wallsCount: int)
+            + getPawn(): Pawn
+            # decrementWalls()
+            + getWallsLeft(): int
+        }
+    }
+
+    package turn {
+        interface Turn <<interface>> {
+            + player(): Player {abstract}
+        }
+
+        class MovePawnTurn <<leaf>> {
+            - player: Player {readOnly}
+            - destination: Field {readOnly}
+            --
+            + MovePawnTurn(player: Player, destination: Field)
+            + player(): Player
+            + destination(): Field
+        }
+        Turn <|.. MovePawnTurn
+
+        class PlaceWallTurn <<leaf>> {
+            - player: Player {readOnly}
+            - wall: Wall {readOnly}
+            --
+            + PlaceWallTurn(player: Player, wall: Wall)
+            + player(): Player
+            + wall(): Wall
+        }
+        Turn <|.. PlaceWallTurn
+
+        class NoOperationTurn <<leaf>> {
+            - player: Player {readOnly}
+            --
+            + NoOperationTurn(player: Player)
+            + player(): Player
+        }
+        Turn <|.. NoOperationTurn
+    }
+}
+
+@enduml

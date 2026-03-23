@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Launch",
+            "request": "launch",
+            "preLaunchTask": "assemble",
+            "shortenCommandLine": "none",
+            "mainClass": "de.quoridor.Main",
+            "projectName": "app"
+        }
+    ]
+}

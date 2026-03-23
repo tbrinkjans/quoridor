@@ -1,0 +1,19 @@
+{
+    "editor.formatOnSave": true,
+    "files.trimTrailingWhitespace": true,
+    "files.associations": {
+        "gradlew": "shellscript"
+    },
+    "[java]": {
+        "editor.defaultFormatter": "redhat.java",
+        "editor.codeActionsOnSave": {
+            "source.addMissingImports": "explicit",
+            "source.organizeImports": "explicit"
+        }
+    },
+    "java.format.settings.url": "eclipse-formatter.xml",
+    "java.sources.organizeImports.staticStarThreshold": 1,
+    "java.completion.importOrder": [],
+    "java.completion.filteredTypes": [],
+    "java.configuration.updateBuildConfiguration": "automatic"
+}
