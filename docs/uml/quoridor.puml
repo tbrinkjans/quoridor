@@ -4,13 +4,16 @@
 !include config/styles.iuml
 
 ' class diagram (https://plantuml.com/class-diagram)
-package quoridor {
+package app {
     package common {
         class Position <<leaf>> {
             - x: int {readOnly}
             - y: int {readOnly}
             --
             + Position(x: int, y: int)
+            + isAlignedTo(other: Position): boolean
+            + isAdjacentTo(other: Position): boolean
+            + isAdjacentTo(other: Position, orientation: Orientation): boolean
             + x(): int
             + y(): int
         }
@@ -18,28 +21,54 @@ package quoridor {
         enum Orientation <<enumeration>> {
             + HORIZONTAL
             + VERTICAL
+            --
+            + opposite(): Orientation
         }
     }
 
-    package board {
-        class Board {
-            - fields: Field[][] {readOnly}
-            - walls: Set<Wall> {readOnly}
-            - pawns: List<Pawn> {readOnly}
-            --
-            + Board(pawnsCount: int)
-            + getFields(): Field[][]
-            + placeWall(wall: Wall)
-            + getWalls(): Set<Wall>
-            + movePawn(pawn: Pawn, destination: Field)
-            + getPawns(): List<Pawn>
+    package exception {
+        package setup {
+            class GameSetupException <<exception>> {
+                + GameSetupException(error: GameSetupError)
+                + getError(): GameSetupError
+            }
+            GameSetupException *-- "1" GameSetupError : - error: GameSetupError {readOnly}
+
+            enum GameSetupError {
+                + INVALID_PLAYER_COUNT
+            }
         }
 
+        package game {
+            class GameException <<exception>> {
+                + GameException(error: GameError)
+                + getError(): GameError
+            }
+            GameException *-- "1" GameError : - error: GameError {readOnly}
+
+            enum GameError {
+                + INVALID_TURN
+            }
+        }
+    }
+
+    package game {
+        class Board {
+            # Board(pawnCount: int)
+            - createFields()
+            + getFields(): Field[][]
+            - createPawns(pawnCount: int)
+            + movePawn(pawn: Pawn, destination: Field)
+            + getPawns(): List<Pawn>
+            + placeWall(wall: Wall)
+            - removeNeighbor(a: Field, b: Field)
+            + getWalls(): Set<Wall>
+        }
+        Board *-- "81" Field : - fields: Field[][] {readOnly}
+        Board *-- "2..4" Pawn : - pawns: List<Pawn> {readOnly}
+        Board *-- "*" Wall : - walls: Set<Wall> {readOnly}
+
         class Field {
-            - position: Position {readOnly}
-            - neighbors: Set<Field> {readOnly}
-            - pawn: Pawn
-            --
             # Field(position: Position)
             + getPosition(): Position
             # addNeighbor(field: Field)
@@ -49,91 +78,145 @@ package quoridor {
             + hasPawn(): boolean
             + getPawn(): Pawn
         }
+        Field *-- "1" app.common.Position : - position: Position {readOnly}
+        Field --> "1..4" Field : - neighbors: Set<Field> {readOnly}
+        Field --> "0..1" Pawn : - pawn: Pawn
 
         class Pawn {
-            - field: Field
-            - winningFields: Set<Field> {readOnly}
-            --
-            # Pawn(startingField: Field, winningFields: Set<Field>)
+            # Pawn(startingField: Field, finishFields: Set<Field>)
             # setField(field: Field)
             + getField(): Field
             + hasReachedFinish(): boolean
-            + getWinningFields(): Set<Field>
+            + getFinishFields(): Set<Field>
         }
+        Pawn --> "1" Field : - field: Field
+        Pawn --> "9" Field : - finishFields: Set<Field> {readOnly}
 
-        class Wall {
-            - position: Position {readOnly}
-            - orientation: Orientation {readOnly}
-            --
+        class Wall <<leaf>> {
             + Wall(position: Position, orientation: Orientation)
-            + getPosition(): Position
-            + getOrientation(): Orientation
+            + position(): Position
+            + orientation(): Orientation
         }
-    }
+        Wall *-- "1" app.common.Position : - position: Position {readOnly}
+        Wall *-- "1" app.common.Orientation : - orientation: Orientation {readOnly}
 
-    package game {
         class Game {
-            - board: Board {readOnly}
-            - players: List<Player> {readOnly}
             - currentPlayerIndex: int
-            - turns: Stack<Turn> {readOnly}
+            - finished: boolean
             --
-            + create(playersCount): Game {static}
-            - Game(playersCount: int)
-            + executeTurn(turn: Turn)
-            + validateTurn(turn: Turn): boolean
-            + getValidTurns(player: Player): Set<Turn>
-            + hasValidTurns(player: Player): boolean
-            - nextCurrentPlayer()
-            + getCurrentPlayerIndex(): int
+            + create(playerCount): Game {static}
+            - Game(playerCount: int)
+            + getBoard(): Board
+            - createPlayers(playerCount: int)
             + getCurrentPlayer(): Player
             + getPlayers(): List<Player>
-            + getBoard(): Board
+            - registerTurnHandlers()
+            - getTurnHandler(turn: Turn): TurnHandler<Turn>
+            + executeTurn(turn: Turn)
+            - nextPlayer()
+            + validateTurn(turn: Turn): boolean
+            + generateValidTurns(player: Player): Set<Turn>
+            + hasValidTurns(player: Player): boolean
+            + getTurnHistory(): Stack<Turn>
+            + isFinished(): boolean
+            + getWinner(): Player
         }
+        Game *-- "1" Board : - board: Board {readOnly}
+        Game *-- "2..4" Player : - players: List<Player> {readOnly}
+        Game *-- "*" app.turn.TurnHandler : - turnHandlers: Map<Class<?: Turn>, TurnHandler<?>> {readOnly}
+        Game *-- "*" app.turn.TurnGenerator : - turnGenerators: List<TurnGenerator<?>> {readOnly}
+        Game *-- "*" app.turn.TurnAvailability : - turnAvailabilitys: List<TurnAvailability<?>> {readOnly}
+        Game --> "*" app.turn.Turn : - turnHistory: Stack<Turn> {readOnly}
+        Game --> "0..1" Player : - winner: Player
+        Game ..> app.exception.setup.GameSetupException : throws
+        Game ..> app.exception.game.GameException : throws
 
         class Player {
-            - pawn: Pawn {readOnly}
-            - wallsLeft: int
+            - wallCount: int
             --
-            # Player(pawn: Pawn, wallsCount: int)
+            # Player(pawn: Pawn, wallCount: int)
+            + hasWon(): boolean
             + getPawn(): Pawn
-            # decrementWalls()
-            + getWallsLeft(): int
+            + reduceWallCount()
+            + hasWallsRemaining(): boolean
+            + getWallCount(): int
         }
+        Player o-- "1" Pawn : - pawn: Pawn {readOnly}
     }
 
     package turn {
+        package operation {
+            class MovePawnTurn <<leaf>> {
+                + MovePawnTurn(player: Player, destination: Field)
+                + player(): Player
+                + destination(): Field
+            }
+            app.turn.Turn <|.. MovePawnTurn
+            MovePawnTurn --> "1" app.game.Player : - player: Player {readOnly}
+            MovePawnTurn --> "1" app.game.Field : - destination: Field {readOnly}
+
+            class PlaceWallTurn <<leaf>> {
+                + PlaceWallTurn(player: Player, wall: Wall)
+                + player(): Player
+                + wall(): Wall
+            }
+            app.turn.Turn <|.. PlaceWallTurn
+            PlaceWallTurn --> "1" app.game.Player : - player: Player {readOnly}
+            PlaceWallTurn --> "1" app.game.Wall : - wall: Wall {readOnly}
+
+            class NoOperationTurn <<leaf>> {
+                + NoOperationTurn(player: Player)
+                + player(): Player
+            }
+            app.turn.Turn <|.. NoOperationTurn
+            NoOperationTurn --> "1" app.game.Player : - player: Player {readOnly}
+        }
+
+        package handler {
+            class MovePawnTurnHandler {
+                + execute(board: Board, turn: MovePawnTurn)
+                + validate(board: Board, turn: MovePawnTurn): boolean
+                + generate(player: Player): Stream<MovePawnTurn>
+                - generateMovements(current: Field): Stream<Field>
+                - generateMovementsAtNeighbor(current: Field, neighbor: Field): Stream<Field>
+                + any(player: Player): boolean
+            }
+            app.turn.TurnHandler <|.. MovePawnTurnHandler : <<bind>> <T -> MovePawnTurn>
+            app.turn.TurnGenerator <|.. MovePawnTurnHandler : <<bind>> <T -> MovePawnTurn>
+            app.turn.TurnAvailability <|.. MovePawnTurnHandler : <<bind>> <T -> MovePawnTurn>
+
+            class PlaceWallTurnHandler {
+                + execute(board: Board, turn: PlaceWallTurn)
+                + validate(board: Board, turn: PlaceWallTurn): boolean
+                - validatePlacement(board: Board, wall: Wall): boolean
+                + any(player: Player): boolean
+            }
+            app.turn.TurnHandler <|.. PlaceWallTurnHandler : <<bind>> <T -> PlaceWallTurn>
+            app.turn.TurnAvailability <|.. PlaceWallTurnHandler : <<bind>> <T -> PlaceWallTurn>
+
+            class NoOperationTurnHandler {
+                + execute(board: Board, turn: NoOperationTurn)
+                + validate(board: Board, turn: NoOperationTurn): boolean
+            }
+            app.turn.TurnHandler <|.. NoOperationTurnHandler : <<bind>> <T -> NoOperationTurn>
+        }
+
         interface Turn <<interface>> {
             + player(): Player {abstract}
         }
 
-        class MovePawnTurn <<leaf>> {
-            - player: Player {readOnly}
-            - destination: Field {readOnly}
-            --
-            + MovePawnTurn(player: Player, destination: Field)
-            + player(): Player
-            + destination(): Field
+        interface TurnHandler<T: Turn> <<interface>> {
+            + execute(board: Board, turn: T) {abstract}
+            + validate(board: Board, turn: T): boolean {abstract}
         }
-        Turn <|.. MovePawnTurn
 
-        class PlaceWallTurn <<leaf>> {
-            - player: Player {readOnly}
-            - wall: Wall {readOnly}
-            --
-            + PlaceWallTurn(player: Player, wall: Wall)
-            + player(): Player
-            + wall(): Wall
+        interface TurnGenerator<T: Turn> <<interface>> {
+            + generate(player: Player): Stream<T> {abstract}
         }
-        Turn <|.. PlaceWallTurn
 
-        class NoOperationTurn <<leaf>> {
-            - player: Player {readOnly}
-            --
-            + NoOperationTurn(player: Player)
-            + player(): Player
+        interface TurnAvailability<T: Turn> <<interface>> {
+            + any(player: Player): boolean {abstract}
         }
-        Turn <|.. NoOperationTurn
     }
 }
 
