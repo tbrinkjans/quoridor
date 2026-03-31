@@ -1,5 +1,5 @@
 package de.quoridor.exception.setup;
 
-public enum GameSetupError {
+public enum SetupError {
     INVALID_PLAYER_COUNT
 }

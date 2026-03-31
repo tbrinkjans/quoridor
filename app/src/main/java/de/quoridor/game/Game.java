@@ -1,9 +1,9 @@
 package de.quoridor.game;
 
-import de.quoridor.exception.game.GameError;
-import de.quoridor.exception.game.GameException;
-import de.quoridor.exception.setup.GameSetupError;
-import de.quoridor.exception.setup.GameSetupException;
+import de.quoridor.exception.setup.SetupError;
+import de.quoridor.exception.setup.SetupException;
+import de.quoridor.exception.turn.TurnError;
+import de.quoridor.exception.turn.TurnException;
 import de.quoridor.turn.Turn;
 import de.quoridor.turn.TurnAvailability;
 import de.quoridor.turn.TurnGenerator;
@@ -39,7 +39,7 @@ public class Game {
 
     public static Game create(int playerCount) {
         if (playerCount < 2 || playerCount > 4) {
-            throw new GameSetupException(GameSetupError.INVALID_PLAYER_COUNT);
+            throw new SetupException(SetupError.INVALID_PLAYER_COUNT);
         }
         return new Game(playerCount);
     }
@@ -101,7 +101,7 @@ public class Game {
 
     public void executeTurn(Turn turn) {
         if (!validateTurn(turn)) {
-            throw new GameException(GameError.INVALID_TURN);
+            throw new TurnException(TurnError.INVALID_TURN);
         }
 
         TurnHandler<Turn> handler = getTurnHandler(turn);

@@ -28,25 +28,25 @@ package app {
 
     package exception {
         package setup {
-            class GameSetupException <<exception>> {
-                + GameSetupException(error: GameSetupError)
-                + getError(): GameSetupError
+            class SetupException <<exception>> {
+                + SetupException(error: SetupError)
+                + getError(): SetupError
             }
-            GameSetupException *-- "1" GameSetupError : - error: GameSetupError {readOnly}
+            SetupException *-- "1" SetupError : - error: SetupError {readOnly}
 
-            enum GameSetupError {
+            enum SetupError <<enumeration>> {
                 + INVALID_PLAYER_COUNT
             }
         }
 
-        package game {
-            class GameException <<exception>> {
-                + GameException(error: GameError)
-                + getError(): GameError
+        package turn {
+            class TurnException <<exception>> {
+                + TurnException(error: TurnError)
+                + getError(): TurnError
             }
-            GameException *-- "1" GameError : - error: GameError {readOnly}
+            TurnException *-- "1" TurnError : - error: TurnError {readOnly}
 
-            enum GameError {
+            enum TurnError <<enumeration>> {
                 + INVALID_TURN
             }
         }
@@ -129,8 +129,8 @@ package app {
         Game *-- "*" app.turn.TurnAvailability : - turnAvailabilitys: List<TurnAvailability<?>> {readOnly}
         Game --> "*" app.turn.Turn : - turnHistory: Stack<Turn> {readOnly}
         Game --> "0..1" Player : - winner: Player
-        Game ..> app.exception.setup.GameSetupException : throws
-        Game ..> app.exception.game.GameException : throws
+        Game ..> app.exception.setup.SetupException : throws
+        Game ..> app.exception.turn.TurnException : throws
 
         class Player {
             - wallCount: int
