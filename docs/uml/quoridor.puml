@@ -113,6 +113,7 @@ package app {
             - registerTurnHandlers()
             - getTurnHandler(turn: Turn): TurnHandler<Turn>
             + executeTurn(turn: Turn)
+            - finishGame(winner: Player)
             - nextPlayer()
             + validateTurn(turn: Turn): boolean
             + generateValidTurns(player: Player): Set<Turn>

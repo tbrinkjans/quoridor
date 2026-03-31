@@ -110,12 +110,16 @@ public class Game {
 
         Player player = turn.player();
         if (player.hasWon()) {
-            finished = true;
-            winner = player;
+            finishGame(player);
             return;
         }
 
         nextPlayer();
+    }
+
+    private void finishGame(Player winner) {
+        finished = true;
+        this.winner = winner;
     }
 
     private void nextPlayer() {
