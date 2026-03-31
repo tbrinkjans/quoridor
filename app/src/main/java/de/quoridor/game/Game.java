@@ -147,12 +147,20 @@ public class Game {
     }
 
     public Set<Turn> generateValidTurns(Player player) {
+        if (finished || player != getCurrentPlayer()) {
+            return Set.of();
+        }
+
         return turnGenerators.stream()
             .flatMap(generator -> generator.generate(player))
             .collect(Collectors.toSet());
     }
 
     public boolean hasValidTurns(Player player) {
+        if (finished || player != getCurrentPlayer()) {
+            return false;
+        }
+
         return turnAvailabilitys.stream()
             .anyMatch(availability -> availability.any(player));
     }
