@@ -2,6 +2,7 @@ package de.quoridor.turn.handler;
 
 import de.quoridor.common.Orientation;
 import de.quoridor.common.Position;
+import de.quoridor.exception.turn.TurnError;
 import de.quoridor.game.Board;
 import de.quoridor.game.Player;
 import de.quoridor.game.Wall;
@@ -21,14 +22,18 @@ public class PlaceWallTurnHandler implements TurnHandler<PlaceWallTurn>, TurnAva
     }
 
     @Override
-    public boolean validate(Board board, PlaceWallTurn turn) {
+    public TurnError validate(Board board, PlaceWallTurn turn) {
         Player player = turn.player();
         if (!player.hasWallsRemaining()) {
-            return false;
+            return TurnError.NO_WALLS_REMAINING;
         }
 
         Wall wall = turn.wall();
-        return validatePlacement(board, wall);
+        if (!validatePlacement(board, wall)) {
+            return TurnError.INVALID_PLACEMENT;
+        }
+
+        return null;
     }
 
     private boolean validatePlacement(Board board, Wall wall) {

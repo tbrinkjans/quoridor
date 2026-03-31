@@ -100,8 +100,9 @@ public class Game {
     }
 
     public void executeTurn(Turn turn) {
-        if (!validateTurn(turn)) {
-            throw new TurnException(TurnError.INVALID_TURN);
+        TurnError error = validateTurn(turn);
+        if (error != null) {
+            throw new TurnException(error);
         }
 
         TurnHandler<Turn> handler = getTurnHandler(turn);
@@ -132,9 +133,13 @@ public class Game {
         }
     }
 
-    public boolean validateTurn(Turn turn) {
-        if (finished || turn.player() != getCurrentPlayer()) {
-            return false;
+    public TurnError validateTurn(Turn turn) {
+        if (finished) {
+            return TurnError.GAME_ALREADY_FINISHED;
+        }
+
+        if (turn.player() != getCurrentPlayer()) {
+            return TurnError.NOT_CURRENT_PLAYER;
         }
 
         TurnHandler<Turn> handler = getTurnHandler(turn);

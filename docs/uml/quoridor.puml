@@ -47,7 +47,11 @@ package app {
             TurnException *-- "1" TurnError : - error: TurnError {readOnly}
 
             enum TurnError <<enumeration>> {
-                + INVALID_TURN
+                + NOT_CURRENT_PLAYER
+                + INVALID_MOVEMENT
+                + NO_WALLS_REMAINING
+                + INVALID_PLACEMENT
+                + GAME_ALREADY_FINISHED
             }
         }
     }
@@ -115,7 +119,7 @@ package app {
             + executeTurn(turn: Turn)
             - finishGame(winner: Player)
             - nextPlayer()
-            + validateTurn(turn: Turn): boolean
+            + validateTurn(turn: Turn): TurnError
             + generateValidTurns(player: Player): Set<Turn>
             + hasValidTurns(player: Player): boolean
             + getTurnHistory(): Stack<Turn>
@@ -176,7 +180,8 @@ package app {
         package handler {
             class MovePawnTurnHandler {
                 + execute(board: Board, turn: MovePawnTurn)
-                + validate(board: Board, turn: MovePawnTurn): boolean
+                + validate(board: Board, turn: MovePawnTurn): TurnError
+                - validateMovement(board: Board, pawn: Pawn, destination: Field): boolean
                 + generate(player: Player): Stream<MovePawnTurn>
                 - generateMovements(current: Field): Stream<Field>
                 - generateMovementsAtNeighbor(current: Field, neighbor: Field): Stream<Field>
@@ -188,7 +193,7 @@ package app {
 
             class PlaceWallTurnHandler {
                 + execute(board: Board, turn: PlaceWallTurn)
-                + validate(board: Board, turn: PlaceWallTurn): boolean
+                + validate(board: Board, turn: PlaceWallTurn): TurnError
                 - validatePlacement(board: Board, wall: Wall): boolean
                 + any(player: Player): boolean
             }
@@ -197,7 +202,7 @@ package app {
 
             class NoOperationTurnHandler {
                 + execute(board: Board, turn: NoOperationTurn)
-                + validate(board: Board, turn: NoOperationTurn): boolean
+                + validate(board: Board, turn: NoOperationTurn): TurnError
             }
             app.turn.TurnHandler <|.. NoOperationTurnHandler : <<bind>> <T -> NoOperationTurn>
         }
@@ -208,7 +213,7 @@ package app {
 
         interface TurnHandler<T: Turn> <<interface>> {
             + execute(board: Board, turn: T) {abstract}
-            + validate(board: Board, turn: T): boolean {abstract}
+            + validate(board: Board, turn: T): TurnError {abstract}
         }
 
         interface TurnGenerator<T: Turn> <<interface>> {

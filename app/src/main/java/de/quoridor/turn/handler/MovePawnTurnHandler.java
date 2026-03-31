@@ -1,5 +1,6 @@
 package de.quoridor.turn.handler;
 
+import de.quoridor.exception.turn.TurnError;
 import de.quoridor.game.Board;
 import de.quoridor.game.Field;
 import de.quoridor.game.Pawn;
@@ -23,9 +24,18 @@ public class MovePawnTurnHandler
     }
 
     @Override
-    public boolean validate(Board board, MovePawnTurn turn) {
-        Player player = turn.player();
-        return generate(player).anyMatch(t -> t.equals(turn));
+    public TurnError validate(Board board, MovePawnTurn turn) {
+        Pawn pawn = turn.player().getPawn();
+        Field destination = turn.destination();
+        if (!validateMovement(board, pawn, destination)) {
+            return TurnError.INVALID_MOVEMENT;
+        }
+        return null;
+    }
+
+    private boolean validateMovement(Board board, Pawn pawn, Field destination) {
+        Field current = pawn.getField();
+        return generateMovements(current).anyMatch(d -> d.equals(destination));
     }
 
     @Override
