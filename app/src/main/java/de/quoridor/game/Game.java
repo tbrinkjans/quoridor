@@ -90,8 +90,8 @@ public class Game {
 
         turnGenerators.add(movePawnTurnHandler);
 
-        turnAvailabilitys.add(movePawnTurnHandler);
         turnAvailabilitys.add(placeWallTurnHandler);
+        turnAvailabilitys.add(movePawnTurnHandler);
     }
 
     @SuppressWarnings("unchecked")
