@@ -1,6 +1,5 @@
 package de.quoridor.turn.handler;
 
-import de.quoridor.common.Orientation;
 import de.quoridor.common.Position;
 import de.quoridor.exception.turn.TurnError;
 import de.quoridor.game.Board;
@@ -37,21 +36,24 @@ public class PlaceWallTurnHandler implements TurnHandler<PlaceWallTurn>, TurnAva
     }
 
     private boolean validatePlacement(Board board, Wall wall) {
-        Position position = wall.position();
-        if (position.x() < 0 || position.x() >= 7 || position.y() < 0 || position.y() >= 7) {
-            return false;
-        }
+        return !positionInvalid(wall.position())
+            && !positionOccupied(board.getWalls(), wall.position())
+            && !wallOverlaps(board.getWalls(), wall);
+    }
 
-        Set<Wall> walls = board.getWalls();
-        boolean occupied = walls.stream().anyMatch(w -> w.position().equals(position));
-        if (occupied) {
-            return false;
-        }
+    private boolean positionInvalid(Position position) {
+        return position.x() < 0 || position.x() > 7 || position.y() < 0 || position.y() > 7;
+    }
 
-        Orientation orientation = wall.orientation();
+    private boolean positionOccupied(Set<Wall> walls, Position position) {
         return walls.stream()
-            .filter(w -> w.orientation() == orientation)
-            .noneMatch(w -> w.position().isAdjacentTo(position, orientation));
+            .anyMatch(w -> w.position().equals(position));
+    }
+
+    private boolean wallOverlaps(Set<Wall> walls, Wall wall) {
+        return walls.stream()
+            .filter(w -> w.orientation() == wall.orientation())
+            .anyMatch(w -> w.position().isAdjacentTo(wall.position(), wall.orientation()));
     }
 
     @Override

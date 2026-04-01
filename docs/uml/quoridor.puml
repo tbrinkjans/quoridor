@@ -195,6 +195,9 @@ package app {
                 + execute(board: Board, turn: PlaceWallTurn)
                 + validate(board: Board, turn: PlaceWallTurn): TurnError
                 - validatePlacement(board: Board, wall: Wall): boolean
+                - positionInvalid(position: Position): boolean
+                - positionOccupied(walls: Set<Wall>, position: Position): boolean
+                - wallOverlaps(walls: Set<Wall>, wall: Wall): boolean
                 + any(player: Player): boolean
             }
             app.turn.TurnHandler <|.. PlaceWallTurnHandler : <<bind>> <T -> PlaceWallTurn>
