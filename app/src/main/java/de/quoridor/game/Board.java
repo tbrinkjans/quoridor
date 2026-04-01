@@ -84,6 +84,24 @@ public class Board {
     }
 
     public void placeWall(Wall wall) {
+        List<Field[]> splitFields = getSplitFields(wall);
+        for (Field[] pair : splitFields) {
+            pair[0].removeNeighbor(pair[1]);
+            pair[1].removeNeighbor(pair[0]);
+        }
+        walls.add(wall);
+    }
+
+    public void removeWall(Wall wall) {
+        List<Field[]> splitFields = getSplitFields(wall);
+        for (Field[] pair : splitFields) {
+            pair[0].addNeighbor(pair[1]);
+            pair[1].addNeighbor(pair[0]);
+        }
+        walls.remove(wall);
+    }
+
+    private List<Field[]> getSplitFields(Wall wall) {
         Position position = wall.position();
         Orientation orientation = wall.orientation();
 
@@ -92,20 +110,16 @@ public class Board {
         Field topRight = fields[position.x() + 1][position.y() + 1];
         Field topLeft = fields[position.x()][position.y() + 1];
 
+        List<Field[]> splitFields = new ArrayList<>();
         if (orientation == Orientation.HORIZONTAL) {
-            removeNeighbors(bottomLeft, topLeft);
-            removeNeighbors(bottomRight, topRight);
+            splitFields.add(new Field[] { bottomLeft, topLeft });
+            splitFields.add(new Field[] { bottomRight, topRight });
         } else {
-            removeNeighbors(bottomLeft, bottomRight);
-            removeNeighbors(topLeft, topRight);
+            splitFields.add(new Field[] { bottomLeft, bottomRight });
+            splitFields.add(new Field[] { topLeft, topRight });
         }
 
-        walls.add(wall);
-    }
-
-    private void removeNeighbors(Field a, Field b) {
-        a.removeNeighbor(b);
-        b.removeNeighbor(a);
+        return splitFields;
     }
 
     public Set<Wall> getWalls() {

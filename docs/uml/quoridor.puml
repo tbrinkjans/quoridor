@@ -65,7 +65,8 @@ package app {
             + movePawn(pawn: Pawn, destination: Field)
             + getPawns(): List<Pawn>
             + placeWall(wall: Wall)
-            - removeNeighbor(a: Field, b: Field)
+            + removeWall(wall: Wall)
+            - getSplitFields(wall: Wall): List<Field[]>
             + getWalls(): Set<Wall>
         }
         Board *-- "81" Field : - fields: Field[][] {readOnly}
@@ -198,6 +199,8 @@ package app {
                 - positionInvalid(position: Position): boolean
                 - positionOccupied(walls: Set<Wall>, position: Position): boolean
                 - wallOverlaps(walls: Set<Wall>, wall: Wall): boolean
+                - wallBlocksPath(board: Board, wall: Wall): boolean
+                - pathExists(pawn: Pawn): boolean
                 + any(player: Player): boolean
             }
             app.turn.TurnHandler <|.. PlaceWallTurnHandler : <<bind>> <T -> PlaceWallTurn>
