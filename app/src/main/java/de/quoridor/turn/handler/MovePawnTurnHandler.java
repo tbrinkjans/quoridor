@@ -27,15 +27,16 @@ public class MovePawnTurnHandler
     public TurnError validate(Board board, MovePawnTurn turn) {
         Pawn pawn = turn.player().getPawn();
         Field destination = turn.destination();
-        if (!validateMovement(board, pawn, destination)) {
+        if (!validateMovement(pawn, destination)) {
             return TurnError.INVALID_MOVEMENT;
         }
         return null;
     }
 
-    private boolean validateMovement(Board board, Pawn pawn, Field destination) {
+    private boolean validateMovement(Pawn pawn, Field destination) {
         Field current = pawn.getField();
-        return generateMovements(current).anyMatch(d -> d.equals(destination));
+        return generateMovements(current)
+            .anyMatch(d -> d.equals(destination));
     }
 
     @Override
@@ -57,17 +58,17 @@ public class MovePawnTurnHandler
             return Stream.of(neighbor);
         }
 
-        List<Field> emptyNeighborFields = neighbor.getNeighbors().stream()
+        List<Field> jumpableFields = neighbor.getNeighbors().stream()
             .filter(field -> !field.hasPawn())
             .toList();
 
-        Optional<Field> fieldBehindNeighbor = emptyNeighborFields.stream()
+        Optional<Field> straightJumpableField = jumpableFields.stream()
             .filter(field -> field.getPosition().isAlignedTo(current.getPosition()))
             .findFirst();
 
-        return fieldBehindNeighbor.isPresent()
-            ? fieldBehindNeighbor.stream()
-            : emptyNeighborFields.stream();
+        return straightJumpableField.isPresent()
+            ? straightJumpableField.stream()
+            : jumpableFields.stream();
     }
 
     @Override

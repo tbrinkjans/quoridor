@@ -182,7 +182,7 @@ package app {
             class MovePawnTurnHandler {
                 + execute(board: Board, turn: MovePawnTurn)
                 + validate(board: Board, turn: MovePawnTurn): TurnError
-                - validateMovement(board: Board, pawn: Pawn, destination: Field): boolean
+                - validateMovement(pawn: Pawn, destination: Field): boolean
                 + generate(player: Player): Stream<MovePawnTurn>
                 - generateMovements(current: Field): Stream<Field>
                 - generateMovementsAtNeighbor(current: Field, neighbor: Field): Stream<Field>
