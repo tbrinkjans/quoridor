@@ -8,12 +8,10 @@ import de.quoridor.turn.Turn;
 import de.quoridor.turn.TurnAvailability;
 import de.quoridor.turn.TurnGenerator;
 import de.quoridor.turn.TurnHandler;
-import de.quoridor.turn.handler.MovePawnTurnHandler;
-import de.quoridor.turn.handler.NoOperationTurnHandler;
-import de.quoridor.turn.handler.PlaceWallTurnHandler;
-import de.quoridor.turn.operation.MovePawnTurn;
-import de.quoridor.turn.operation.NoOperationTurn;
-import de.quoridor.turn.operation.PlaceWallTurn;
+import de.quoridor.turn.move.MovePawnTurn;
+import de.quoridor.turn.move.MovePawnTurnHandler;
+import de.quoridor.turn.place.PlaceWallTurn;
+import de.quoridor.turn.place.PlaceWallTurnHandler;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -80,17 +78,13 @@ public class Game {
     }
 
     private void registerTurnHandlers() {
-        MovePawnTurnHandler movePawnTurnHandler = new MovePawnTurnHandler();
         PlaceWallTurnHandler placeWallTurnHandler = new PlaceWallTurnHandler();
-        NoOperationTurnHandler noOperationTurnHandler = new NoOperationTurnHandler();
-
-        turnHandlers.put(MovePawnTurn.class, movePawnTurnHandler);
         turnHandlers.put(PlaceWallTurn.class, placeWallTurnHandler);
-        turnHandlers.put(NoOperationTurn.class, noOperationTurnHandler);
-
-        turnGenerators.add(movePawnTurnHandler);
-
         turnAvailabilitys.add(placeWallTurnHandler);
+
+        MovePawnTurnHandler movePawnTurnHandler = new MovePawnTurnHandler();
+        turnHandlers.put(MovePawnTurn.class, movePawnTurnHandler);
+        turnGenerators.add(movePawnTurnHandler);
         turnAvailabilitys.add(movePawnTurnHandler);
     }
 
@@ -128,8 +122,8 @@ public class Game {
 
         Player nextPlayer = getCurrentPlayer();
         if (!hasValidTurns(nextPlayer)) {
-            // If the next player has no valid turns, automatically execute a no-op turn for them
-            executeTurn(new NoOperationTurn(nextPlayer));
+            // If the next player has no valid turns, skip them
+            nextPlayer();
         }
     }
 

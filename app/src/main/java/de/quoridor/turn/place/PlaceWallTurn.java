@@ -1,4 +1,4 @@
-package de.quoridor.turn.operation;
+package de.quoridor.turn.place;
 
 import de.quoridor.game.Player;
 import de.quoridor.game.Wall;

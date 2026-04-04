@@ -151,7 +151,7 @@ package app {
     }
 
     package turn {
-        package operation {
+        package move {
             class MovePawnTurn <<leaf>> {
                 + MovePawnTurn(player: Player, destination: Field)
                 + player(): Player
@@ -161,24 +161,6 @@ package app {
             MovePawnTurn --> "1" app.game.Player : - player: Player {readOnly}
             MovePawnTurn --> "1" app.game.Field : - destination: Field {readOnly}
 
-            class PlaceWallTurn <<leaf>> {
-                + PlaceWallTurn(player: Player, wall: Wall)
-                + player(): Player
-                + wall(): Wall
-            }
-            app.turn.Turn <|.. PlaceWallTurn
-            PlaceWallTurn --> "1" app.game.Player : - player: Player {readOnly}
-            PlaceWallTurn --> "1" app.game.Wall : - wall: Wall {readOnly}
-
-            class NoOperationTurn <<leaf>> {
-                + NoOperationTurn(player: Player)
-                + player(): Player
-            }
-            app.turn.Turn <|.. NoOperationTurn
-            NoOperationTurn --> "1" app.game.Player : - player: Player {readOnly}
-        }
-
-        package handler {
             class MovePawnTurnHandler {
                 + execute(board: Board, turn: MovePawnTurn)
                 + validate(board: Board, turn: MovePawnTurn): TurnError
@@ -191,6 +173,17 @@ package app {
             app.turn.TurnHandler <|.. MovePawnTurnHandler : <<bind>> <T -> MovePawnTurn>
             app.turn.TurnGenerator <|.. MovePawnTurnHandler : <<bind>> <T -> MovePawnTurn>
             app.turn.TurnAvailability <|.. MovePawnTurnHandler : <<bind>> <T -> MovePawnTurn>
+        }
+
+        package place {
+            class PlaceWallTurn <<leaf>> {
+                + PlaceWallTurn(player: Player, wall: Wall)
+                + player(): Player
+                + wall(): Wall
+            }
+            app.turn.Turn <|.. PlaceWallTurn
+            PlaceWallTurn --> "1" app.game.Player : - player: Player {readOnly}
+            PlaceWallTurn --> "1" app.game.Wall : - wall: Wall {readOnly}
 
             class PlaceWallTurnHandler {
                 + execute(board: Board, turn: PlaceWallTurn)
@@ -205,12 +198,6 @@ package app {
             }
             app.turn.TurnHandler <|.. PlaceWallTurnHandler : <<bind>> <T -> PlaceWallTurn>
             app.turn.TurnAvailability <|.. PlaceWallTurnHandler : <<bind>> <T -> PlaceWallTurn>
-
-            class NoOperationTurnHandler {
-                + execute(board: Board, turn: NoOperationTurn)
-                + validate(board: Board, turn: NoOperationTurn): TurnError
-            }
-            app.turn.TurnHandler <|.. NoOperationTurnHandler : <<bind>> <T -> NoOperationTurn>
         }
 
         interface Turn <<interface>> {
