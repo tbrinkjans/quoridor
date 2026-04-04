@@ -59,46 +59,35 @@ public class Board {
     }
 
     protected Pawn addPawn() {
-        int i = pawns.size();
-        if (i == 1) {
-            i++;
-        } else if (i == 2) {
-            Pawn last = pawns.get(1);
-            placePawn(last, 1);
-        }
-
         Pawn pawn = new Pawn();
-        placePawn(pawn, i);
         pawns.add(pawn);
-
+        updatePawnFields();
         return pawn;
     }
 
     protected void removePawn(Pawn pawn) {
         Field field = pawn.getField();
         field.setPawn(null);
-
-        int i = pawns.indexOf(pawn);
         pawns.remove(pawn);
-
-        int count = pawns.size();
-        for (int j = i; j < count; j++) {
-            Pawn current = pawns.get(j);
-            placePawn(current, j);
-        }
-
-        if (count == 2) {
-            Pawn last = pawns.get(1);
-            placePawn(last, 2);
-        }
+        updatePawnFields();
     }
 
-    private void placePawn(Pawn pawn, int i) {
-        Field startingField = startingFields.get(i);
-        movePawn(pawn, startingField);
+    private void updatePawnFields() {
+        int pawnCount = pawns.size();
+        for (int i = 0; i < pawnCount; i++) {
+            Pawn pawn = pawns.get(i);
 
-        Set<Field> finishFields = this.finishFields.get(i);
-        pawn.setFinishFields(finishFields);
+            if (i == 1 && pawnCount == 2) {
+                // In a 2-player game, the 2nd player starts on the opposite side of the board
+                i++;
+            }
+
+            Field startingField = startingFields.get(i);
+            movePawn(pawn, startingField);
+
+            Set<Field> finishFields = this.finishFields.get(i);
+            pawn.setFinishFields(finishFields);
+        }
     }
 
     public void movePawn(Pawn pawn, Field destination) {

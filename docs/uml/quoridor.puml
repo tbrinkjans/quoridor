@@ -65,7 +65,7 @@ package app {
             + getFields(): Field[][]
             # addPawn(): Pawn
             # removePawn(pawn: Pawn)
-            - placePawn(pawn: Pawn, i: int)
+            - updatePawnFields()
             + movePawn(pawn: Pawn, destination: Field)
             + getPawns(): List<Pawn>
             + placeWall(wall: Wall)
