@@ -115,6 +115,7 @@ package app {
         class Game {
             - currentPlayerIndex: int
             --
+            + Game()
             + getBoard(): Board
             + addPlayer(): Player
             + removePlayer(player: Player)

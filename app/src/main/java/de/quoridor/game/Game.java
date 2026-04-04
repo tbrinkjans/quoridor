@@ -35,6 +35,10 @@ public class Game {
     private GameState state = GameState.SETUP;
     private Player winner;
 
+    public Game() {
+        registerTurnHandlers();
+    }
+
     public Board getBoard() {
         return board;
     }
@@ -123,11 +127,12 @@ public class Game {
             throw new SetupException(SetupError.INVALID_GAME_STATE);
         }
 
-        if (players.size() < 2) {
+        int playerCount = players.size();
+        if (playerCount < 2) {
             throw new SetupException(SetupError.INVALID_PLAYER_COUNT);
         }
 
-        registerTurnHandlers();
+        currentPlayerIndex = (int) (Math.random() * playerCount);
         state = GameState.RUNNING;
     }
 
