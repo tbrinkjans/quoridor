@@ -7,15 +7,20 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Board {
     private final Field[][] fields = new Field[9][9];
+    private final List<Field> startingFields = new ArrayList<>();
+    private final List<Set<Field>> finishFields = new ArrayList<>();
+
     private final List<Pawn> pawns = new ArrayList<>();
+
     private final Set<Wall> walls = new HashSet<>();
 
-    protected Board(int pawnCount) {
+    protected Board() {
         createFields();
-        createPawns(pawnCount);
+        initPawnFields();
     }
 
     private void createFields() {
@@ -37,44 +42,70 @@ public class Board {
         }
     }
 
+    private void initPawnFields() {
+        startingFields.add(fields[4][0]);
+        startingFields.add(fields[0][4]);
+        startingFields.add(fields[4][8]);
+        startingFields.add(fields[8][4]);
+
+        finishFields.add(Arrays.stream(fields).map(field -> field[8]).collect(Collectors.toSet()));
+        finishFields.add(Set.of(fields[8]));
+        finishFields.add(Arrays.stream(fields).map(field -> field[0]).collect(Collectors.toSet()));
+        finishFields.add(Set.of(fields[0]));
+    }
+
     public Field[][] getFields() {
         return fields;
     }
 
-    private void createPawns(int pawnCount) {
-        Field[] pawnStartingFields = {
-            fields[4][0],
-            fields[0][4],
-            fields[4][8],
-            fields[8][4]
-        };
-
-        Field[][] pawnFinishFields = {
-            Arrays.stream(fields).map(field -> field[8]).toArray(Field[]::new),
-            fields[8],
-            Arrays.stream(fields).map(field -> field[0]).toArray(Field[]::new),
-            fields[0]
-        };
-
-        for (int i = 0; i < pawnCount; i++) {
-            if (i == 1 && pawnCount == 2) {
-                // In a 2-player game, the 2nd player starts on the opposite side of the board
-                i++;
-            }
-
-            Field startingField = pawnStartingFields[i];
-            Set<Field> finishFields = Set.of(pawnFinishFields[i]);
-
-            Pawn pawn = new Pawn(startingField, finishFields);
-            startingField.setPawn(pawn);
-
-            pawns.add(pawn);
+    protected Pawn addPawn() {
+        int i = pawns.size();
+        if (i == 1) {
+            i++;
+        } else if (i == 2) {
+            Pawn last = pawns.get(1);
+            placePawn(last, 1);
         }
+
+        Pawn pawn = new Pawn();
+        placePawn(pawn, i);
+        pawns.add(pawn);
+
+        return pawn;
+    }
+
+    protected void removePawn(Pawn pawn) {
+        Field field = pawn.getField();
+        field.setPawn(null);
+
+        int i = pawns.indexOf(pawn);
+        pawns.remove(pawn);
+
+        int count = pawns.size();
+        for (int j = i; j < count; j++) {
+            Pawn current = pawns.get(j);
+            placePawn(current, j);
+        }
+
+        if (count == 2) {
+            Pawn last = pawns.get(1);
+            placePawn(last, 2);
+        }
+    }
+
+    private void placePawn(Pawn pawn, int i) {
+        Field startingField = startingFields.get(i);
+        movePawn(pawn, startingField);
+
+        Set<Field> finishFields = this.finishFields.get(i);
+        pawn.setFinishFields(finishFields);
     }
 
     public void movePawn(Pawn pawn, Field destination) {
         Field current = pawn.getField();
-        current.setPawn(null);
+        if (current != null) {
+            current.setPawn(null);
+        }
         destination.setPawn(pawn);
         pawn.setField(destination);
     }

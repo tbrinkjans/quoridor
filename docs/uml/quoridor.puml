@@ -59,10 +59,13 @@ package app {
 
     package game {
         class Board {
-            # Board(pawnCount: int)
+            # Board()
             - createFields()
+            - initPawnFields()
             + getFields(): Field[][]
-            - createPawns(pawnCount: int)
+            # addPawn(): Pawn
+            # removePawn(pawn: Pawn)
+            - placePawn(pawn: Pawn, i: int)
             + movePawn(pawn: Pawn, destination: Field)
             + getPawns(): List<Pawn>
             + placeWall(wall: Wall)
@@ -71,6 +74,8 @@ package app {
             + getWalls(): Set<Wall>
         }
         Board *-- "81" Field : - fields: Field[][] {readOnly}
+        Board --> "4" Field : - startingFields: List<Field> {readOnly}
+        Board --> "36" Field : - finishFields: List<Set<Field>> {readOnly}
         Board *-- "2..4" Pawn : - pawns: List<Pawn> {readOnly}
         Board *-- "*" Wall : - walls: Set<Wall> {readOnly}
 
@@ -89,14 +94,15 @@ package app {
         Field --> "0..1" Pawn : - pawn: Pawn
 
         class Pawn {
-            # Pawn(startingField: Field, finishFields: Set<Field>)
+            # Pawn()
             # setField(field: Field)
             + getField(): Field
+            # setFinishFields(finishFields: Set<Field>)
             + hasReachedFinish(): boolean
             + getFinishFields(): Set<Field>
         }
         Pawn --> "1" Field : - field: Field
-        Pawn --> "9" Field : - finishFields: Set<Field> {readOnly}
+        Pawn --> "9" Field : - finishFields: Set<Field>
 
         class Wall <<leaf>> {
             + Wall(position: Position, orientation: Orientation)

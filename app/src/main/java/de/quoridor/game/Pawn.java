@@ -4,12 +4,9 @@ import java.util.Set;
 
 public class Pawn {
     private Field field;
-    private final Set<Field> finishFields;
+    private Set<Field> finishFields;
 
-    protected Pawn(Field startingField, Set<Field> finishFields) {
-        field = startingField;
-        this.finishFields = finishFields;
-    }
+    protected Pawn() {}
 
     protected void setField(Field field) {
         this.field = field;
@@ -17,6 +14,10 @@ public class Pawn {
 
     public Field getField() {
         return field;
+    }
+
+    protected void setFinishFields(Set<Field> finishFields) {
+        this.finishFields = finishFields;
     }
 
     public boolean hasReachedFinish() {

@@ -21,7 +21,7 @@ import java.util.Stack;
 import java.util.stream.Collectors;
 
 public class Game {
-    private final Board board;
+    private final Board board = new Board();
 
     private final List<Player> players = new ArrayList<>();
     private int currentPlayerIndex;
@@ -43,7 +43,6 @@ public class Game {
     }
 
     private Game(int playerCount) {
-        board = new Board(playerCount);
         createPlayers(playerCount);
     }
 
@@ -52,11 +51,9 @@ public class Game {
     }
 
     private void createPlayers(int playerCount) {
-        List<Pawn> pawns = board.getPawns();
         int playerWallCount = Math.ceilDiv(20, playerCount);
-
         for (int i = 0; i < playerCount; i++) {
-            Pawn pawn = pawns.get(i);
+            Pawn pawn = board.addPawn();
             int wallCount = playerWallCount;
             if (i == 1 && playerCount == 3) {
                 // In a 3-player game, the 2nd player starts with one wall less
