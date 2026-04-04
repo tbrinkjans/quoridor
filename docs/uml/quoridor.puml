@@ -65,7 +65,7 @@ package app {
             + movePawn(pawn: Pawn, destination: Field)
             + getPawns(): List<Pawn>
             + placeWall(wall: Wall)
-            + removeWall(wall: Wall)
+            + revertWall(wall: Wall)
             - getSplitFields(wall: Wall): List<Field[]>
             + getWalls(): Set<Wall>
         }

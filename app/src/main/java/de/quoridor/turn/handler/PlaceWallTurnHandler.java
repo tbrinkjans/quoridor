@@ -70,7 +70,7 @@ public class PlaceWallTurnHandler implements TurnHandler<PlaceWallTurn>, TurnAva
         boolean pathBlocked = pawns.stream()
             .anyMatch(pawn -> !pathExists(pawn));
 
-        board.removeWall(wall);
+        board.revertWall(wall);
 
         return pathBlocked;
     }

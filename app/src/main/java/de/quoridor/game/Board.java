@@ -92,7 +92,7 @@ public class Board {
         walls.add(wall);
     }
 
-    public void removeWall(Wall wall) {
+    public void revertWall(Wall wall) {
         List<Field[]> splitFields = getSplitFields(wall);
         for (Field[] pair : splitFields) {
             pair[0].addNeighbor(pair[1]);
