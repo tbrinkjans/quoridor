@@ -35,8 +35,8 @@ package app {
             SetupException *-- "1" SetupError : - error: SetupError {readOnly}
 
             enum SetupError <<enumeration>> {
+                + INVALID_GAME_STATE
                 + INVALID_PLAYER_COUNT
-                + GAME_ALREADY_STARTED
             }
         }
 
@@ -64,7 +64,7 @@ package app {
             - initPawnFields()
             + getFields(): Field[][]
             # addPawn(): Pawn
-            # removePawn(pawn: Pawn)
+            # removePawn(pawn: Pawn, reposition: boolean)
             - updatePawnFields()
             + movePawn(pawn: Pawn, destination: Field)
             + getPawns(): List<Pawn>
@@ -118,6 +118,8 @@ package app {
             + getBoard(): Board
             + addPlayer(): Player
             + removePlayer(player: Player)
+            - removePlayerSetup(player: Player)
+            - removePlayerRunning(player: Player)
             - updatePlayerWallCounts()
             + getCurrentPlayer(): Player
             + getPlayers(): List<Player>

@@ -65,11 +65,13 @@ public class Board {
         return pawn;
     }
 
-    protected void removePawn(Pawn pawn) {
+    protected void removePawn(Pawn pawn, boolean reposition) {
         Field field = pawn.getField();
         field.setPawn(null);
         pawns.remove(pawn);
-        updatePawnFields();
+        if (reposition) {
+            updatePawnFields();
+        }
     }
 
     private void updatePawnFields() {

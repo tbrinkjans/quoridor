@@ -41,7 +41,7 @@ public class Game {
 
     public Player addPlayer() {
         if (state != GameState.SETUP) {
-            throw new SetupException(SetupError.GAME_ALREADY_STARTED);
+            throw new SetupException(SetupError.INVALID_GAME_STATE);
         }
 
         if (players.size() == 4) {
@@ -57,14 +57,42 @@ public class Game {
     }
 
     public void removePlayer(Player player) {
-        if (state != GameState.SETUP) {
-            throw new SetupException(SetupError.GAME_ALREADY_STARTED);
+        if (state == GameState.FINISHED) {
+            throw new SetupException(SetupError.INVALID_GAME_STATE);
         }
 
+        if (state == GameState.SETUP) {
+            removePlayerSetup(player);
+        } else {
+            removePlayerRunning(player);
+        }
+    }
+
+    private void removePlayerSetup(Player player) {
         Pawn pawn = player.getPawn();
-        board.removePawn(pawn);
+        board.removePawn(pawn, true);
         players.remove(player);
         updatePlayerWallCounts();
+    }
+
+    private void removePlayerRunning(Player player) {
+        int index = players.indexOf(player);
+
+        Pawn pawn = player.getPawn();
+        board.removePawn(pawn, false);
+        players.remove(player);
+
+        if (index < currentPlayerIndex) {
+            currentPlayerIndex--;
+        } else if (index == currentPlayerIndex) {
+            currentPlayerIndex--;
+            nextPlayer();
+        }
+
+        if (players.size() == 1) {
+            Player winner = players.getFirst();
+            finish(winner);
+        }
     }
 
     private void updatePlayerWallCounts() {
@@ -92,7 +120,7 @@ public class Game {
 
     public void start() {
         if (state != GameState.SETUP) {
-            throw new SetupException(SetupError.GAME_ALREADY_STARTED);
+            throw new SetupException(SetupError.INVALID_GAME_STATE);
         }
 
         if (players.size() < 2) {
