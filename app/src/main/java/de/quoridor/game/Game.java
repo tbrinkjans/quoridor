@@ -32,7 +32,7 @@ public class Game {
 
     private final Stack<Turn> turnHistory = new Stack<>();
 
-    private boolean finished;
+    private GameState state = GameState.SETUP;
     private Player winner;
 
     public static Game create(int playerCount) {
@@ -45,7 +45,6 @@ public class Game {
     private Game(int playerCount) {
         board = new Board(playerCount);
         createPlayers(playerCount);
-        registerTurnHandlers();
     }
 
     public Board getBoard() {
@@ -77,6 +76,15 @@ public class Game {
         return players;
     }
 
+    public void start() {
+        if (state != GameState.SETUP) {
+            throw new SetupException(SetupError.GAME_ALREADY_STARTED);
+        }
+
+        registerTurnHandlers();
+        state = GameState.RUNNING;
+    }
+
     private void registerTurnHandlers() {
         PlaceWallTurnHandler placeWallTurnHandler = new PlaceWallTurnHandler();
         turnHandlers.put(PlaceWallTurn.class, placeWallTurnHandler);
@@ -105,16 +113,16 @@ public class Game {
 
         Player player = turn.player();
         if (player.hasWon()) {
-            finishGame(player);
+            finish(player);
             return;
         }
 
         nextPlayer();
     }
 
-    private void finishGame(Player winner) {
-        finished = true;
+    private void finish(Player winner) {
         this.winner = winner;
+        state = GameState.FINISHED;
     }
 
     private void nextPlayer() {
@@ -128,8 +136,8 @@ public class Game {
     }
 
     public TurnError validateTurn(Turn turn) {
-        if (finished) {
-            return TurnError.GAME_ALREADY_FINISHED;
+        if (state != GameState.RUNNING) {
+            return TurnError.INVALID_GAME_STATE;
         }
 
         if (turn.player() != getCurrentPlayer()) {
@@ -141,7 +149,7 @@ public class Game {
     }
 
     public Set<Turn> generateValidTurns(Player player) {
-        if (finished || player != getCurrentPlayer()) {
+        if (state != GameState.RUNNING || player != getCurrentPlayer()) {
             return Set.of();
         }
 
@@ -151,7 +159,7 @@ public class Game {
     }
 
     public boolean hasValidTurns(Player player) {
-        if (finished || player != getCurrentPlayer()) {
+        if (state != GameState.RUNNING || player != getCurrentPlayer()) {
             return false;
         }
 
@@ -163,8 +171,8 @@ public class Game {
         return turnHistory;
     }
 
-    public boolean isFinished() {
-        return finished;
+    public GameState getState() {
+        return state;
     }
 
     public Player getWinner() {

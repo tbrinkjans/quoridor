@@ -1,5 +1,6 @@
 package de.quoridor.exception.setup;
 
 public enum SetupError {
-    INVALID_PLAYER_COUNT
+    INVALID_PLAYER_COUNT,
+    GAME_ALREADY_STARTED
 }

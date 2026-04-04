@@ -36,6 +36,7 @@ package app {
 
             enum SetupError <<enumeration>> {
                 + INVALID_PLAYER_COUNT
+                + GAME_ALREADY_STARTED
             }
         }
 
@@ -47,11 +48,11 @@ package app {
             TurnException *-- "1" TurnError : - error: TurnError {readOnly}
 
             enum TurnError <<enumeration>> {
+                + INVALID_GAME_STATE
                 + NOT_CURRENT_PLAYER
                 + INVALID_MOVEMENT
                 + NO_WALLS_REMAINING
                 + INVALID_PLACEMENT
-                + GAME_ALREADY_FINISHED
             }
         }
     }
@@ -107,7 +108,6 @@ package app {
 
         class Game {
             - currentPlayerIndex: int
-            - finished: boolean
             --
             + create(playerCount): Game {static}
             - Game(playerCount: int)
@@ -115,16 +115,17 @@ package app {
             - createPlayers(playerCount: int)
             + getCurrentPlayer(): Player
             + getPlayers(): List<Player>
+            + start()
             - registerTurnHandlers()
             - getTurnHandler(turn: Turn): TurnHandler<Turn>
             + executeTurn(turn: Turn)
-            - finishGame(winner: Player)
+            - finish(winner: Player)
             - nextPlayer()
             + validateTurn(turn: Turn): TurnError
             + generateValidTurns(player: Player): Set<Turn>
             + hasValidTurns(player: Player): boolean
             + getTurnHistory(): Stack<Turn>
-            + isFinished(): boolean
+            + getState(): GameState
             + getWinner(): Player
         }
         Game *-- "1" Board : - board: Board {readOnly}
@@ -133,9 +134,16 @@ package app {
         Game *-- "*" app.turn.TurnGenerator : - turnGenerators: List<TurnGenerator<?>> {readOnly}
         Game *-- "*" app.turn.TurnAvailability : - turnAvailabilitys: List<TurnAvailability<?>> {readOnly}
         Game --> "*" app.turn.Turn : - turnHistory: Stack<Turn> {readOnly}
+        Game *-- "1" GameState : - state: GameState
         Game --> "0..1" Player : - winner: Player
         Game ..> app.exception.setup.SetupException : throws
         Game ..> app.exception.turn.TurnException : throws
+
+        enum GameState <<enumeration>> {
+            + SETUP
+            + RUNNING
+            + FINISHED
+        }
 
         class Player {
             - wallCount: int

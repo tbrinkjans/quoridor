@@ -1,7 +1,7 @@
 **Spielmechanik:**
 
+- Hinzufügen/Entfernen von Spielern/Figuren hinzufügen
 - Spiel konfigurierbar machen (bspw. Spielfeldgröße, Wände, ...)
-- Hinzufügen/Entfernen von Spielern/Figuren + GameState hinzufügen
 - Startspieler per Zufall entscheiden (sinnvoll/regelkonform?)
 - Zeitlimit pro Spieler einführen (je Zug und/oder gesamt)
 
