@@ -4,9 +4,8 @@ public class Player {
     private final Pawn pawn;
     private int wallCount;
 
-    protected Player(Pawn pawn, int wallCount) {
+    protected Player(Pawn pawn) {
         this.pawn = pawn;
-        this.wallCount = wallCount;
     }
 
     public boolean hasWon() {
@@ -15,6 +14,10 @@ public class Player {
 
     public Pawn getPawn() {
         return pawn;
+    }
+
+    protected void setWallCount(int wallCount) {
+        this.wallCount = wallCount;
     }
 
     public void reduceWallCount() {

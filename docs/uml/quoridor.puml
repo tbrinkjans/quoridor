@@ -115,10 +115,10 @@ package app {
         class Game {
             - currentPlayerIndex: int
             --
-            + create(playerCount): Game {static}
-            - Game(playerCount: int)
             + getBoard(): Board
-            - createPlayers(playerCount: int)
+            + addPlayer(): Player
+            + removePlayer(player: Player)
+            - updatePlayerWallCounts()
             + getCurrentPlayer(): Player
             + getPlayers(): List<Player>
             + start()
@@ -154,9 +154,10 @@ package app {
         class Player {
             - wallCount: int
             --
-            # Player(pawn: Pawn, wallCount: int)
+            # Player(pawn: Pawn)
             + hasWon(): boolean
             + getPawn(): Pawn
+            # setWallCount(wallCount: int)
             + reduceWallCount()
             + hasWallsRemaining(): boolean
             + getWallCount(): int

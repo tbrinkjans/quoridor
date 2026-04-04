@@ -35,33 +35,50 @@ public class Game {
     private GameState state = GameState.SETUP;
     private Player winner;
 
-    public static Game create(int playerCount) {
-        if (playerCount < 2 || playerCount > 4) {
-            throw new SetupException(SetupError.INVALID_PLAYER_COUNT);
-        }
-        return new Game(playerCount);
-    }
-
-    private Game(int playerCount) {
-        createPlayers(playerCount);
-    }
-
     public Board getBoard() {
         return board;
     }
 
-    private void createPlayers(int playerCount) {
-        int playerWallCount = Math.ceilDiv(20, playerCount);
+    public Player addPlayer() {
+        if (state != GameState.SETUP) {
+            throw new SetupException(SetupError.GAME_ALREADY_STARTED);
+        }
+
+        if (players.size() == 4) {
+            throw new SetupException(SetupError.INVALID_PLAYER_COUNT);
+        }
+
+        Pawn pawn = board.addPawn();
+        Player player = new Player(pawn);
+        players.add(player);
+        updatePlayerWallCounts();
+
+        return player;
+    }
+
+    public void removePlayer(Player player) {
+        if (state != GameState.SETUP) {
+            throw new SetupException(SetupError.GAME_ALREADY_STARTED);
+        }
+
+        Pawn pawn = player.getPawn();
+        board.removePawn(pawn);
+        players.remove(player);
+        updatePlayerWallCounts();
+    }
+
+    private void updatePlayerWallCounts() {
+        int playerCount = players.size();
         for (int i = 0; i < playerCount; i++) {
-            Pawn pawn = board.addPawn();
-            int wallCount = playerWallCount;
+            Player player = players.get(i);
+
+            int wallCount = Math.ceilDiv(20, playerCount);
             if (i == 1 && playerCount == 3) {
                 // In a 3-player game, the 2nd player starts with one wall less
                 wallCount--;
             }
 
-            Player player = new Player(pawn, wallCount);
-            players.add(player);
+            player.setWallCount(wallCount);
         }
     }
 
@@ -76,6 +93,10 @@ public class Game {
     public void start() {
         if (state != GameState.SETUP) {
             throw new SetupException(SetupError.GAME_ALREADY_STARTED);
+        }
+
+        if (players.size() < 2) {
+            throw new SetupException(SetupError.INVALID_PLAYER_COUNT);
         }
 
         registerTurnHandlers();
