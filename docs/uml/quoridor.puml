@@ -139,9 +139,9 @@ package app {
         }
         Game *-- "1" Board : - board: Board {readOnly}
         Game *-- "2..4" Player : - players: List<Player> {readOnly}
-        Game *-- "*" app.turn.TurnHandler : - turnHandlers: Map<Class<?: Turn>, TurnHandler<?>> {readOnly}
-        Game *-- "*" app.turn.TurnGenerator : - turnGenerators: List<TurnGenerator<?>> {readOnly}
-        Game *-- "*" app.turn.TurnAvailability : - turnAvailabilitys: List<TurnAvailability<?>> {readOnly}
+        Game *-- "*" app.turn.handler.TurnHandler : - turnHandlers: Map<Class<?: Turn>, TurnHandler<?>> {readOnly}
+        Game *-- "*" app.turn.handler.TurnGenerator : - turnGenerators: List<TurnGenerator<?>> {readOnly}
+        Game *-- "*" app.turn.handler.TurnAvailability : - turnAvailabilitys: List<TurnAvailability<?>> {readOnly}
         Game --> "*" app.turn.Turn : - turnHistory: Stack<Turn> {readOnly}
         Game *-- "1" GameState : - state: GameState
         Game --> "0..1" Player : - winner: Player
@@ -169,16 +169,7 @@ package app {
     }
 
     package turn {
-        package move {
-            class MovePawnTurn <<leaf>> {
-                + MovePawnTurn(player: Player, destination: Field)
-                + player(): Player
-                + destination(): Field
-            }
-            app.turn.Turn <|.. MovePawnTurn
-            MovePawnTurn --> "1" app.game.Player : - player: Player {readOnly}
-            MovePawnTurn --> "1" app.game.Field : - destination: Field {readOnly}
-
+        package handler {
             class MovePawnTurnHandler {
                 + execute(board: Board, turn: MovePawnTurn)
                 + validate(board: Board, turn: MovePawnTurn): TurnError
@@ -188,20 +179,9 @@ package app {
                 - generateMovementsAtNeighbor(current: Field, neighbor: Field): Stream<Field>
                 + any(player: Player): boolean
             }
-            app.turn.TurnHandler <|.. MovePawnTurnHandler : <<bind>> <T -> MovePawnTurn>
-            app.turn.TurnGenerator <|.. MovePawnTurnHandler : <<bind>> <T -> MovePawnTurn>
-            app.turn.TurnAvailability <|.. MovePawnTurnHandler : <<bind>> <T -> MovePawnTurn>
-        }
-
-        package place {
-            class PlaceWallTurn <<leaf>> {
-                + PlaceWallTurn(player: Player, wall: Wall)
-                + player(): Player
-                + wall(): Wall
-            }
-            app.turn.Turn <|.. PlaceWallTurn
-            PlaceWallTurn --> "1" app.game.Player : - player: Player {readOnly}
-            PlaceWallTurn --> "1" app.game.Wall : - wall: Wall {readOnly}
+            TurnHandler <|.. MovePawnTurnHandler : <<bind>> <T -> MovePawnTurn>
+            TurnGenerator <|.. MovePawnTurnHandler : <<bind>> <T -> MovePawnTurn>
+            TurnAvailability <|.. MovePawnTurnHandler : <<bind>> <T -> MovePawnTurn>
 
             class PlaceWallTurnHandler {
                 + execute(board: Board, turn: PlaceWallTurn)
@@ -214,26 +194,45 @@ package app {
                 - pathExists(pawn: Pawn): boolean
                 + any(player: Player): boolean
             }
-            app.turn.TurnHandler <|.. PlaceWallTurnHandler : <<bind>> <T -> PlaceWallTurn>
-            app.turn.TurnAvailability <|.. PlaceWallTurnHandler : <<bind>> <T -> PlaceWallTurn>
+            TurnHandler <|.. PlaceWallTurnHandler : <<bind>> <T -> PlaceWallTurn>
+            TurnAvailability <|.. PlaceWallTurnHandler : <<bind>> <T -> PlaceWallTurn>
+
+            interface TurnHandler<T: Turn> <<interface>> {
+                + execute(board: Board, turn: T) {abstract}
+                + validate(board: Board, turn: T): TurnError {abstract}
+            }
+
+            interface TurnGenerator<T: Turn> <<interface>> {
+                + generate(player: Player): Stream<T> {abstract}
+            }
+
+            interface TurnAvailability<T: Turn> <<interface>> {
+                + any(player: Player): boolean {abstract}
+            }
         }
+
+        class MovePawnTurn <<leaf>> {
+            + MovePawnTurn(player: Player, destination: Field)
+            + player(): Player
+            + destination(): Field
+        }
+        Turn <|.. MovePawnTurn
+        MovePawnTurn --> "1" app.game.Player : - player: Player {readOnly}
+        MovePawnTurn --> "1" app.game.Field : - destination: Field {readOnly}
+
+        class PlaceWallTurn <<leaf>> {
+            + PlaceWallTurn(player: Player, wall: Wall)
+            + player(): Player
+            + wall(): Wall
+        }
+        Turn <|.. PlaceWallTurn
+        PlaceWallTurn --> "1" app.game.Player : - player: Player {readOnly}
+        PlaceWallTurn --> "1" app.game.Wall : - wall: Wall {readOnly}
 
         interface Turn <<interface>> {
             + player(): Player {abstract}
         }
-
-        interface TurnHandler<T: Turn> <<interface>> {
-            + execute(board: Board, turn: T) {abstract}
-            + validate(board: Board, turn: T): TurnError {abstract}
-        }
-
-        interface TurnGenerator<T: Turn> <<interface>> {
-            + generate(player: Player): Stream<T> {abstract}
-        }
-
-        interface TurnAvailability<T: Turn> <<interface>> {
-            + any(player: Player): boolean {abstract}
-        }
+        note right of Turn : sealed: MovePawnTurn, PlaceWallTurn
     }
 }
 

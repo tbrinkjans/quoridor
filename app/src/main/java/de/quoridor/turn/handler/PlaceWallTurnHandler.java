@@ -1,4 +1,4 @@
-package de.quoridor.turn.place;
+package de.quoridor.turn.handler;
 
 import de.quoridor.common.Position;
 import de.quoridor.exception.turn.TurnError;
@@ -7,8 +7,7 @@ import de.quoridor.game.Field;
 import de.quoridor.game.Pawn;
 import de.quoridor.game.Player;
 import de.quoridor.game.Wall;
-import de.quoridor.turn.TurnAvailability;
-import de.quoridor.turn.TurnHandler;
+import de.quoridor.turn.PlaceWallTurn;
 import java.util.ArrayDeque;
 import java.util.HashSet;
 import java.util.List;

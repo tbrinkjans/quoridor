@@ -1,13 +1,11 @@
-package de.quoridor.turn.move;
+package de.quoridor.turn.handler;
 
 import de.quoridor.exception.turn.TurnError;
 import de.quoridor.game.Board;
 import de.quoridor.game.Field;
 import de.quoridor.game.Pawn;
 import de.quoridor.game.Player;
-import de.quoridor.turn.TurnAvailability;
-import de.quoridor.turn.TurnGenerator;
-import de.quoridor.turn.TurnHandler;
+import de.quoridor.turn.MovePawnTurn;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
