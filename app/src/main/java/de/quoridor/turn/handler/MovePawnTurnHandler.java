@@ -31,9 +31,12 @@ public class MovePawnTurnHandler
     }
 
     private boolean validateMovement(Pawn pawn, Field destination) {
-        Field current = pawn.getField();
-        return generateMovements(current)
-            .anyMatch(d -> d.equals(destination));
+        if (destination == null) {
+            return false;
+        }
+
+        return generateMovements(pawn.getField())
+            .anyMatch(d -> d == destination);
     }
 
     @Override

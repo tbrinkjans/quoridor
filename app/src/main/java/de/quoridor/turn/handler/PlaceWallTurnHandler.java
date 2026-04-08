@@ -40,6 +40,10 @@ public class PlaceWallTurnHandler implements TurnHandler<PlaceWallTurn>, TurnAva
     }
 
     private boolean validatePlacement(Board board, Wall wall) {
+        if (wall == null || wall.position() == null || wall.orientation() == null) {
+            return false;
+        }
+
         return !positionInvalid(wall.position())
             && !positionOccupied(board.getWalls(), wall.position())
             && !wallOverlaps(board.getWalls(), wall)

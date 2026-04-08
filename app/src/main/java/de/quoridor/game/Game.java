@@ -191,6 +191,10 @@ public class Game {
             return TurnError.INVALID_GAME_STATE;
         }
 
+        if (turn == null) {
+            return TurnError.INVALID_TURN;
+        }
+
         if (turn.player() != getCurrentPlayer()) {
             return TurnError.NOT_CURRENT_PLAYER;
         }
