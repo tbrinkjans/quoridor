@@ -1,6 +1,5 @@
 **Domain/Core:**
 
-- Parameter testen (bspw. ob `Player` in `players`)
 - Testing mit Gradle einrichten und UnitTests anlegen
 - GitHub-Pipeline zum Ausführen der Tests konfigurieren
 - Spiellogik von `app` in neues Projekt `domain` verschieben

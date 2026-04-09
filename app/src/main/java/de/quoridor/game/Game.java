@@ -65,6 +65,10 @@ public class Game {
             throw new SetupException(SetupError.INVALID_GAME_STATE);
         }
 
+        if (!players.contains(player)) {
+            throw new SetupException(SetupError.PLAYER_NOT_FOUND);
+        }
+
         if (state == GameState.SETUP) {
             removePlayerSetup(player);
         } else {
