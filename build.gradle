@@ -1,11 +1,5 @@
-allprojects {
-    group = 'de.quoridor'
-    version = '1.0.0'
-
-    repositories {
-        mavenCentral()
-    }
-}
+group = 'de.quoridor'
+version = '1.0.0'
 
 subprojects {
     apply plugin: 'java'
@@ -16,10 +10,13 @@ subprojects {
         }
     }
 
-    tasks.withType(JavaCompile) {
+    repositories {
+        mavenCentral()
+    }
+
+    tasks.withType(JavaCompile).configureEach {
         options.compilerArgs += [
             '-Xlint:all',
-            '-Xlint:-this-escape',
             '-Xlint:-serial'
         ]
     }
