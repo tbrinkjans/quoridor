@@ -15,5 +15,6 @@
     "java.sources.organizeImports.staticStarThreshold": 1,
     "java.completion.importOrder": [],
     "java.completion.filteredTypes": [],
-    "java.configuration.updateBuildConfiguration": "automatic"
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.compile.nullAnalysis.mode": "automatic"
 }

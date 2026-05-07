@@ -6,7 +6,6 @@
             "label": "assemble",
             "command": "gradlew.bat",
             "args": [
-                "clean",
                 "assemble"
             ],
             "group": {

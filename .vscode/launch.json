@@ -2,11 +2,11 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "App",
             "type": "java",
-            "name": "Launch",
             "request": "launch",
             "preLaunchTask": "assemble",
-            "shortenCommandLine": "none",
+            "cwd": "${workspaceFolder}/app",
             "mainClass": "de.quoridor.Main",
             "projectName": "app"
         }
