@@ -12,6 +12,7 @@ package app {
             --
             + Position(x: int, y: int)
             + isAlignedTo(other: Position): boolean
+            + isAlignedTo(other: Position, orientation: Orientation): boolean
             + isAdjacentTo(other: Position): boolean
             + isAdjacentTo(other: Position, orientation: Orientation): boolean
             + x(): int
