@@ -2,8 +2,8 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "type": "process",
             "label": "assemble",
+            "type": "process",
             "command": "gradlew.bat",
             "args": [
                 "assemble"
@@ -12,6 +12,9 @@
                 "kind": "build",
                 "isDefault": true
             },
+            "problemMatcher": [
+                "$gradle"
+            ],
             "presentation": {
                 "clear": true
             }
